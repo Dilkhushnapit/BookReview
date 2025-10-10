@@ -1,26 +1,74 @@
 import React from "react";
 import { Star, ArrowLeft } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useNavigate ,useParams} from "react-router-dom";
+import { useState} from "react";
+import { AppContext } from "../context/appContext";
+import { useEffect } from "react";
+import { useContext } from "react";
+import axios from "axios";
 const BookDetails = () => {
-  const navigate = useNavigate();
-  const [year, setYear] = useState(1925);
-  const reviews = [
-    {
-      text: "A brilliant evocation of the Jazz Age, and a timeless critique of the American dream.",
-      author: "Jessica Harper",
-    },
-    {
-      text: "Fitzgerald's prose is superb, and the narrative is captivating.",
-      author: "Michael Smith",
-    },
-    {
-      text: "A tragic story that is beautifully written and deeply thought-provoking.",
-      author: "Emily Johnson",
-    },
-  ];
+  const { bookId } = useParams()
+  console.log(bookId);
+  const [bookData,setBookData]=useState({})
+  const { books } = useContext(AppContext);
+  const {backendUrl,token}=useContext(AppContext)
 
-  const rating = 4.5;
+
+  const fetchBookInfo =  () =>{
+     const bookInfo=  books.find(book=> book._id=== bookId);
+         setBookData(bookInfo || {});
+    console.log("✅ Found Book Info:", bookInfo);
+  }
+  console.log('bookdata');
+  console.log(books);
+  console.log(bookData);
+
+
+  useEffect(() => {
+
+    if (books && books.length > 0) {
+      fetchBookInfo();
+    } else {
+      console.log("⏳ Waiting for books to load...");
+    }
+  }, [bookId, books]);
+
+
+  const navigate = useNavigate();
+
+  const [reviews,setReviews]=useState([]);
+  const fetchReviews=async()=>{
+    try {
+      const {data}=await axios(backendUrl+'/api/book/reviews/'+bookId);
+      if(data.success)
+      {
+        setReviews(data.reviews);
+      }
+      
+    } catch (error) {
+      console.error("Error fetching reviews:", error);
+    }
+  }
+  useEffect(()=>{
+    fetchReviews();
+  },[bookId])
+  console.log('Reviews:', reviews);
+  // Dummy rating for illustration
+
+  const rating = (reviews) => {
+    if (reviews.length === 0) return 0;
+    let total = 0;
+    for(const review of reviews)
+    {
+      total+=review.rating;
+    }
+    return total / reviews.length;
+  }
+  console.log('Average Rating:', rating(reviews));
+  const avgRating = rating(reviews);
+
+
+
 
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col items-center p-6">
@@ -39,26 +87,25 @@ const BookDetails = () => {
         <div className="flex flex-col md:flex-row gap-6">
           {/* Book Image */}
           <img
-            src="https://m.media-amazon.com/images/I/81af+MCATTL.jpg"
+            src={bookData.image}
+            // src="https://m.media-amazon.com/images/I/81af+MCATTL.jpg"
             alt="The Great Gatsby"
             className="w-40 h-56 object-cover rounded-lg"
           />
 
           {/* Book Info */}
           <div>
-            <h2 className="text-2xl font-bold text-gray-800">The Great Gatsby</h2>
-            <p className="text-gray-600 mt-1">by F. Scott Fitzgerald</p>
+            <h2 className="text-2xl font-bold text-gray-800">{bookData.title}</h2>
+            <p className="text-gray-600 mt-1">by {bookData.author}</p>
             <p className="text-gray-500 mt-2">
-              <strong>Genre:</strong> Classic Fiction
+              <strong>Genre:</strong> {bookData.genre}
             </p>
             <p className="text-gray-500 mt-2">
-              <strong>Publication Year:</strong> {year}
+              <strong>Publication Year:</strong> {bookData.year}
             </p>
 
             <p className="mt-4 text-gray-700 leading-relaxed">
-              Set in the Jazz Age on Long Island, the novel depicts narrator Nick
-              Carraway's interactions with mysterious millionaire Jay Gatsby and
-              Gatsby's obsession to reunite with his former lover, Daisy Buchanan.
+              {bookData.description}
             </p>
           </div>
         </div>
@@ -72,9 +119,9 @@ const BookDetails = () => {
                 <Star
                   key={i}
                   className={`w-5 h-5 ${
-                    i < Math.floor(rating)
+                    i < Math.floor(avgRating)
                       ? "text-yellow-400 fill-yellow-400"
-                      : i < rating
+                      : i < Math.ceil(avgRating)
                       ? "text-yellow-400 half-filled"
                       : "text-gray-300"
                   }`}
@@ -93,12 +140,12 @@ const BookDetails = () => {
                 key={index}
                 className="bg-gray-50 p-3 rounded-xl shadow-sm text-gray-700"
               >
-                "{review.text}" - <span className="italic">{review.author}</span>
+                "{review.reviewText}" - <span className="italic">{review.userName}</span>
               </div>
             ))}
           </div>
         </div>
-        <button onClick={() => navigate('/review')} className="flex items-center gap-2 mt-4 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-full transition">
+        <button onClick={() => navigate(`/review/${bookId}`)} className="flex items-center gap-2 mt-4 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-full transition">
            Give your review
         </button>
       </div>

@@ -1,37 +1,11 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-const books = [
-  {
-    id: 1,
-    title: "The Great Gatsby",
-    author: "F. Scott Fitzgerald",
-    image:
-      "https://m.media-amazon.com/images/I/81af+MCATTL.jpg",
-  },
-  {
-    id: 2,
-    title: "1984",
-    author: "George Orwell",
-    image:
-      "https://m.media-amazon.com/images/I/71kxa1-0mfL.jpg",
-  },
-  {
-    id: 3,
-    title: "To Kill a Mockingbird",
-    author: "Harper Lee",
-    image:
-      "https://m.media-amazon.com/images/I/81OtwkiBf6L.jpg",
-  },
-  {
-    id: 4,
-    title: "The Catcher in the Rye",
-    author: "J.D. Salinger",
-    image:
-      "https://m.media-amazon.com/images/I/71GugXkY4oL.jpg",
-  },
-];
+import { AppContext } from "../context/appContext";
+import { useContext } from "react";
 
 const BookList = () => {
+  const { books } = useContext(AppContext);
+  console.log('booksa data for checking', books?.[0]?.author);
     const navigate = useNavigate();
   return (
     <>
@@ -44,12 +18,16 @@ const BookList = () => {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {books.map((book) => (
-              <div onClick={() => navigate(`/book/${book.id}`)}
-                key={book.id}
+              console.log(book),
+              console.log('hiii'),
+              
+              
+              <div onClick={() => navigate(`/book/${book._id}`)}
+                key={book._id}
                 className="bg-white rounded-2xl shadow-md hover:shadow-lg transition p-4 flex flex-col items-center text-center"
               >
                 <img
-                  src={book.image}
+                  src={book?.image}
                   alt={book.title}
                   className="w-40 h-56 object-cover rounded-lg mb-4"
                 />

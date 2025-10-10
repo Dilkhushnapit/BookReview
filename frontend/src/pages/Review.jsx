@@ -1,21 +1,81 @@
 import React, { useState } from "react";
-
+import { data, useParams } from "react-router-dom";
+import { AppContext } from "../context/appContext";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import { useEffect } from "react";
+import axios from "axios";
 const ReviewForm = () => {
+  const {backendUrl,token}=React.useContext(AppContext);
+
+  const navigate = useNavigate();
+  const { bookId } = useParams();
+  const [username,setUserdata]=useState(null);
+  // Fetch user data to get the username
+  const fetchUserData=async()=>{
+    try {
+      const {data}=await axios.get(backendUrl+'/api/user/user-data',{headers:{token}});
+      if(data.success)
+      {
+        setUserdata(data.user.name);
+        console.log('username:', data.user.name);
+      }
+      else{
+        console.error("Failed to fetch user data");
+      }
+      
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
+  }
+  useEffect(()=>{
+    if(token)
+    {
+      fetchUserData();
+    }
+  },[]);
+  
+  useEffect(() => {
+  if (username) {
+    setFormData((prev) => ({ ...prev, userName: username }));
+  }
+}, [username]);
+
+
   const [formData, setFormData] = useState({
     rating: "",
-    review: "",
+    reviewText: "",
+    bookId: bookId,
+    userName: username,
   });
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Submitted Review:", formData);
-    alert("Review submitted successfully!");
-    setFormData({ name: "", rating: "", review: "" });
+    if(!token)
+    {
+      toast.error("You must be logged in to submit a review."); // Show error message
+      navigate('/login');
+    }
+    else
+    {
+      const {data}=await axios.post(backendUrl+`/api/user/add-review`,{...formData},{headers:{token}});
+      if(data.success)
+      {
+        toast.success("Review submitted successfully!");
+        navigate(`/book/${bookId}`);
+      }
+      else
+      {
+        toast.error("Failed to submit review.");
+      }
+
+    }
   };
 
   return (
@@ -56,9 +116,9 @@ const ReviewForm = () => {
               Your Review
             </label>
             <textarea
-              name="review"
+              name="reviewText"
               placeholder="Write your review here..."
-              value={formData.review}
+              value={formData.reviewText}
               onChange={handleChange}
               required
               rows="5"
@@ -69,6 +129,7 @@ const ReviewForm = () => {
           {/* Submit Button */}
           <button
             type="submit"
+            
             className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-full font-semibold transition"
           >
             Submit Review

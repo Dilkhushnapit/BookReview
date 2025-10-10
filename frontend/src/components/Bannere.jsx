@@ -1,5 +1,5 @@
 import React from "react";
-
+import { assets } from "../assets/assets";
 const Banner = () => {
   return (
     <section className="bg-[#FBE7C6] py-16 px-8 md:px-20 flex flex-col md:flex-row items-center justify-between rounded-2xl shadow-md">
@@ -21,7 +21,7 @@ const Banner = () => {
       {/* Right Section - Image */}
       <div className="w-full md:w-1/2 flex justify-center">
         <img
-          src="/banner-illustration.png"
+          src={assets.banner_illustration}
           alt="Reading Illustration"
           className="w-80 md:w-96"
         />

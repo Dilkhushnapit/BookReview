@@ -1,14 +1,13 @@
 import React, { useState } from 'react'
 import { useContext } from 'react'
-// import { AppContext } from '../context/AppContext'
+import { AppContext } from '../context/appContext'
 import {toast} from 'react-toastify'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 import { useEffect } from 'react'
 
 const Login = () => {
-//   const {backendUrl,token,setToken} =useContext(AppContext)
-const [token,setToken]=useState(localStorage.getItem('token')||false);
+ const {backendUrl,token,setToken} =useContext(AppContext)
   const [state,setState]=useState('Sign Up')
   const [name,setName]=useState('')
   const [password,setPassword]=useState('')
@@ -23,7 +22,6 @@ const [token,setToken]=useState(localStorage.getItem('token')||false);
         {
           localStorage.setItem('token',data.token)
           setToken(data.token)
-
         }
         else
         {
@@ -59,7 +57,7 @@ const [token,setToken]=useState(localStorage.getItem('token')||false);
 
   return (
     // onsubmit
-    <form  className='min-h-[80hv] flex items-center '>
+    <form onSubmit={onSubmitHandler} className='min-h-[80hv] flex items-center '>
       <div className='flex flex-col gap-3 m-auto item-start p-8 min-w-[340px] sm:min-w-96 border  rounded text-zinc-600 text-sm shadow-lg   '>
         <p className='text-2xl font-semibold'>
           {state==='Sign Up'? "Create Account": 'LogIn'}
@@ -94,4 +92,4 @@ const [token,setToken]=useState(localStorage.getItem('token')||false);
   )
 }
 
-export default Login
+export default Login;
