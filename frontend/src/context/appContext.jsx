@@ -53,7 +53,7 @@ const AppContextProvider = (props) => {
 
     books,
     token,
-    books,
+
     setBooks,
     setToken,
     backendUrl,
