@@ -40,6 +40,9 @@ import Neurologist from './Neurologist.svg'
 import Pediatricians from './Pediatricians.svg'
 import about_banner_books from './about-banner-books.jpg'
 import upload_area from './upload_area.png'
+
+
+
 export const assets = {
     upload_area,
     about_banner_books,
