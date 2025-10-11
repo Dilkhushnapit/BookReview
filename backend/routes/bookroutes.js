@@ -11,3 +11,5 @@ bookRouter.post('/', authUser, addBook);
 bookRouter.get('/reviews/:bookId', getReviewsByBook);
 
 export default bookRouter;
+
+
